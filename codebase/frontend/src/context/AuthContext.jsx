@@ -13,24 +13,14 @@ export function AuthProvider({ children }) {
         console.error(e);
       }
     }
-    return {
-      id: "S1024",
-      name: "Đoàn Canh",
-      role: "student", // 'student' | 'instructor'
-      cohort: "K4 AI Engineering",
-      email: "canh.dt@vlearn.edu.vn",
-      avatar: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80",
-      icapPoints: 485,
-      resolvedMisconceptions: 12,
-      streakDays: 5,
-      completedLessons: ["lesson-01"]
-    };
+    return null;
   });
 
   const [activeTab, setActiveTab] = useState("home");
   const [selectedLesson, setSelectedLesson] = useState(LESSONS[0]);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
+  const [pendingAction, setPendingAction] = useState(null);
 
   useEffect(() => {
     if (user) {
@@ -45,10 +35,29 @@ export function AuthProvider({ children }) {
     }, 4000);
   };
 
+  const requireAuth = (callback) => {
+    if (!user) {
+      if (callback) {
+        setPendingAction(() => callback);
+      }
+      setIsAuthModalOpen(true);
+      showToast("Yêu cầu đăng nhập", "Vui lòng đăng nhập tài khoản học viên để vào bài học!", "info");
+      return false;
+    }
+    if (callback) callback();
+    return true;
+  };
+
   const login = (userData) => {
     setUser(userData);
     setIsAuthModalOpen(false);
     showToast("Đăng nhập thành công", `Chào mừng ${userData.name} tham gia VLearn!`, "success");
+    if (pendingAction) {
+      pendingAction();
+      setPendingAction(null);
+    } else if (activeTab === "home") {
+      setActiveTab("dashboard");
+    }
   };
 
   const logout = () => {
@@ -94,6 +103,7 @@ export function AuthProvider({ children }) {
       user,
       login,
       logout,
+      requireAuth,
       switchRole,
       activeTab,
       setActiveTab,
