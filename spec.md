@@ -2,13 +2,29 @@
 
 > Cấu trúc phủ đúng "SPEC 8 phần" của chương trình: Bằng chứng (§1-§2) · Lát cắt (§4) · Canvas (đính kèm CP1) · Augment/Automate (§4) · 4 đường đi của trải nghiệm (§6) · Kiểu lỗi (§5) · Kiểm thử (§7) · Phân công (§8). Hướng dẫn viết từng mục: `02-guide.md`.
 
-```markdown
 # AI SPEC — Lớp Học Mô Phỏng Đa Tác Tử (Track D1) · Nhóm [TwoTwo] · Zone [C4]
 Hướng: [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
 Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 ## §1. User & Job
 - Job executor + workflow (đính kèm worksheet JTBD / ảnh sơ đồ): Học viên tự học, muốn ôn tập và hiểu sâu bài giảng thông qua thảo luận.
+  ```mermaid
+  flowchart TD
+      A([Trường hợp: Tự ôn tập qua video/slide]) --> B(Gặp thuật ngữ hoặc khái niệm khó)
+      B --> C{Nỗi đau hiện tại}
+      C -->|Học 1 mình| D[Thiếu người trao đổi, chán nản]
+      C -->|Tài liệu dài| E[Khó tự xâu chuỗi kiến thức]
+      D & E --> F[Mở tính năng Lớp Học Mô Phỏng]
+      F --> G(Học viên đặt câu hỏi)
+      G --> H[Bạn học ảo: Gợi ý ngây ngô/Socratic]
+      H --> I(Học viên phản biện / Tự suy nghĩ)
+      I --> J[Trợ giảng ảo: Can thiệp chốt kiến thức chuẩn]
+      J --> K([Mục tiêu đạt được: Hiểu sâu bài giảng, lấy lại động lực])
+      
+      style A fill:#f9f,stroke:#333,stroke-width:2px
+      style K fill:#bbf,stroke:#333,stroke-width:2px
+      style F fill:#dfd,stroke:#333,stroke-width:2px
+  ```
 - Core JTBD (không tên sản phẩm/AI trong câu): Thảo luận và giải đáp thắc mắc về tài liệu học tập để nắm vững kiến thức.
 - Problem statement (KHÔNG chữ AI): Học viên thường gặp khó khăn khi tự ôn tập một mình do thiếu người trao đổi, phản biện và hướng dẫn, dẫn đến việc hiểu sai hoặc không sâu kiến thức.
 - Evidence (chuẩn A và/hoặc B — log đầy đủ trong repo):
@@ -91,7 +107,7 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 ## §8. Phân công & kế hoạch
 - Phân công có tên: spec / evidence / prompt / code / demo: Đinh Tiến Cảnh - 2A202602918 đảm nhiệm frontend, backend. Ngô Kỳ Anh - 2A202602916 đảm nhiệm spec, evidence và prompt. Vũ Đức Minh - 2A202602895 đảm nhiệm prompt, test case và eval. Nguyễn Ngọc Vĩnh - 2A202602833. Khảo sát người dùng, khảo sát willing user, làm slide và demo.
 - Willing users (≥2 tên) + kế hoạch vòng validation *(bonus, nếu làm)*: Nguyễn Xuân Trường Giang - 2A202602446, Đinh Văn Hùng - 2A202602443, Nguyễn Thanh Phong - 2A202602843. Kế hoạch: Đưa giao diện Web cho 3 bạn đóng vai học viên học bài Attention, chat tự do trong 5 phút. Sau đó phỏng vấn nhanh xem sự xuất hiện của Bạn học ảo (Minh) có làm giảm áp lực học tập và Trợ giảng (Thảo) có gợi ý hiệu quả không.
-- Multi-prototype (nếu làm): trục khác biệt của ≥2 phương án + lý do chọn:
+- Multi-prototype (nếu làm): trục khác biệt của ≥2 phương án + lý do chọn: Bỏ qua
 
 ## §9. Changelog
 | Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
