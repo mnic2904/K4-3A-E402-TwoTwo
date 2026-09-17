@@ -1,12 +1,6 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { 
-  BookOpen, 
-  LogOut, 
-  GraduationCap, 
-  Users,
-  Award
-} from 'lucide-react';
+import { LogOut } from 'lucide-react';
 
 export function Navbar() {
   const { 
@@ -19,69 +13,83 @@ export function Navbar() {
   } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-slate-200/90 shadow-2xs text-slate-800 h-14">
+    <header className="sticky top-0 z-40 w-full bg-[#FFFFFF] border-b border-[#EAEAEA] h-14 shrink-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between gap-4">
         
-        {/* Left: Logo */}
+        {/* Left: Clean Brand Logo */}
         <div 
-          onClick={() => setActiveTab('home')}
-          className="flex items-center gap-2 cursor-pointer select-none group"
+          onClick={() => setActiveTab('classroom')}
+          className="flex items-center gap-2.5 cursor-pointer select-none"
         >
-          <span className="text-2xl font-black tracking-tighter text-[#0056D2] font-sans group-hover:opacity-90 transition-opacity">
-            coursera
-          </span>
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#0056D2] bg-blue-50/80 px-2 py-0.5 rounded border border-blue-200/80">
-            AI Academy
+          <div className="w-7 h-7 rounded bg-[#111111] text-white flex items-center justify-center font-bold text-sm font-mono">
+            V
+          </div>
+          <span className="text-lg font-black tracking-tight text-[#111111]">
+            VLearn
           </span>
         </div>
 
-        {/* Center/Right Nav Links */}
-        <div className="flex items-center gap-3 sm:gap-4">
-          
+        {/* Center: Main Navigation */}
+        <nav className="flex items-center gap-1.5 sm:gap-2">
+          <button
+            onClick={() => setActiveTab('classroom')}
+            className={`px-3.5 py-1.5 rounded-md text-sm font-bold transition-colors cursor-pointer ${
+              activeTab === 'classroom'
+                ? 'bg-[#111111] text-white'
+                : 'text-[#666666] hover:text-[#111111] hover:bg-[#F4F4F2]'
+            }`}
+          >
+            Lớp học
+          </button>
+
           <button
             onClick={() => setActiveTab('home')}
-            className={`text-xs sm:text-sm font-bold transition-colors cursor-pointer ${
-              activeTab === 'home' ? 'text-[#0056D2]' : 'text-slate-600 hover:text-[#0056D2]'
+            className={`px-3.5 py-1.5 rounded-md text-sm font-bold transition-colors cursor-pointer ${
+              activeTab === 'home'
+                ? 'bg-[#111111] text-white'
+                : 'text-[#666666] hover:text-[#111111] hover:bg-[#F4F4F2]'
             }`}
           >
-            Trang Chủ
+            Giáo trình
           </button>
 
           <button
-            onClick={() => requireAuth(() => setActiveTab('classroom'))}
-            className={`px-3.5 py-1.5 rounded-lg text-xs sm:text-sm font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-              activeTab === 'classroom'
-                ? 'bg-[#0056D2] text-white shadow-xs'
-                : 'bg-slate-100 hover:bg-slate-200 text-slate-700'
+            onClick={() => requireAuth(() => setActiveTab('dashboard'))}
+            className={`px-3.5 py-1.5 rounded-md text-sm font-bold transition-colors cursor-pointer ${
+              activeTab === 'dashboard'
+                ? 'bg-[#111111] text-white'
+                : 'text-[#666666] hover:text-[#111111] hover:bg-[#F4F4F2]'
             }`}
           >
-            <Users className="w-3.5 h-3.5" />
-            <span>Lớp Học Đa Tác Tử</span>
+            Hồ sơ học tập
           </button>
+        </nav>
 
-          {/* User Auth controls */}
+        {/* Right: User Status */}
+        <div className="flex items-center gap-3">
           {user ? (
-            <div className="flex items-center gap-2.5 pl-2 border-l border-slate-200">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2.5 text-sm">
+              <div 
+                onClick={() => setActiveTab('dashboard')}
+                className="flex items-center gap-2.5 cursor-pointer hover:opacity-85 transition-opacity px-2.5 py-1 rounded-md border border-[#EAEAEA] bg-[#FAFAFA]"
+              >
                 <img 
-                  src={user.avatar} 
+                  src={user.avatar || "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80"} 
                   alt={user.name} 
-                  className="w-7 h-7 rounded-full object-cover border border-slate-300"
+                  className="w-6 h-6 rounded-full object-cover border border-[#EAEAEA]"
                 />
-                <div className="hidden sm:flex flex-col text-left">
-                  <span className="text-xs font-bold text-slate-900 leading-tight">
-                    {user.name}
-                  </span>
-                  <span className="text-[10px] text-[#0056D2] font-semibold font-mono">
-                    {user.id || 'S1024'} · Học viên K4
-                  </span>
-                </div>
+                <span className="font-bold text-[#111111]">
+                  {user.name}
+                </span>
+                <span className="text-xs font-mono px-2 py-0.5 rounded bg-[#FBF3DB] text-[#956400] border border-[#F2E4B8] font-bold">
+                  {user.icapPoints || 485} ICAP
+                </span>
               </div>
 
               <button
                 onClick={logout}
                 title="Đăng xuất"
-                className="p-1.5 text-slate-400 hover:text-red-600 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
+                className="p-1.5 text-[#888888] hover:text-[#111111] rounded hover:bg-[#F4F4F2] transition-colors cursor-pointer"
               >
                 <LogOut className="w-4 h-4" />
               </button>
@@ -89,12 +97,11 @@ export function Navbar() {
           ) : (
             <button
               onClick={() => setIsAuthModalOpen(true)}
-              className="px-4 py-1.5 bg-[#0056D2] hover:bg-[#00419e] text-white text-xs sm:text-sm font-bold rounded-lg transition-all shadow-xs cursor-pointer active:scale-95"
+              className="px-4 py-2 bg-[#111111] hover:bg-[#2A2A2A] text-white text-xs sm:text-sm font-bold rounded-md transition-colors cursor-pointer"
             >
-              Đăng Nhập Học Viên
+              Đăng nhập
             </button>
           )}
-
         </div>
 
       </div>
