@@ -60,7 +60,7 @@ class SlideKnowledgeEngine:
                     "lines": lines,
                     "difficulty": difficulty,
                     "is_core_concept": is_core_concept,
-                    "citation_code": f"T{'06' if lesson_id == 'lesson-01' else '02'}-{page_num:03d}"
+                    "citation_code": f"T{'01' if lesson_id == 'lesson-01' else '02'}-{page_num:03d}"
                 }
         except Exception as e:
             print(f"[SLIDE_KNOWLEDGE] Error extracting {pdf_path}: {e}")
