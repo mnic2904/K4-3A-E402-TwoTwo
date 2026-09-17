@@ -91,7 +91,7 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 ## §6. Bốn đường đi của trải nghiệm
 - Happy path: Học viên hỏi, Bạn học ảo đưa ra ý kiến ngây ngô/gợi mở, Trợ giảng ảo chốt lại kiến thức chuẩn xác dựa trên Knowledge base. · Low-confidence (②): Trợ lý hoặc bạn học ảo thông báo không có đủ thông tin trong bài giảng để trả lời. · Failure/không căn cứ (①): AI bịa ra kiến thức ngoài slide. · Correction (user sửa): Học viên đính chính lại thông tin hoặc yêu cầu Trợ giảng giải thích rõ hơn câu trả lời của Bạn học ảo.
-- Khi bị đòi ngoài phạm vi (③): Trợ giảng từ chối khéo léo và hướng học viên quay lại chủ đề bài giảng (Knowledge snippet). · Case đặc thù domain (④): 
+- Khi bị đòi ngoài phạm vi (③): Trợ giảng từ chối khéo léo và hướng học viên quay lại chủ đề bài giảng (Knowledge snippet). · Case đặc thù domain (④): Trợ giảng ảo chủ động can thiệp ngắt luồng nếu học viên hiểu sai kiến thức cốt lõi (bị bạn học ảo dẫn dắt sai), hoặc học viên có thể trực tiếp phản biện lại khi hệ thống hiểu lầm ý/bắt bẻ sai từ ngữ.
 
 ## §7. Kiểm thử
 - Chiều chất lượng + định nghĩa kiểm chứng được: 
