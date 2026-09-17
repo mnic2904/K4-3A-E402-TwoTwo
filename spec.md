@@ -2,13 +2,29 @@
 
 > Cấu trúc phủ đúng "SPEC 8 phần" của chương trình: Bằng chứng (§1-§2) · Lát cắt (§4) · Canvas (đính kèm CP1) · Augment/Automate (§4) · 4 đường đi của trải nghiệm (§6) · Kiểu lỗi (§5) · Kiểm thử (§7) · Phân công (§8). Hướng dẫn viết từng mục: `02-guide.md`.
 
-```markdown
 # AI SPEC — Lớp Học Mô Phỏng Đa Tác Tử (Track D1) · Nhóm [TwoTwo] · Zone [C4]
 Hướng: [x] A — VLearn  [ ] B — Trợ lý Học viên  [ ] C — Làn mở
 Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 ## §1. User & Job
 - Job executor + workflow (đính kèm worksheet JTBD / ảnh sơ đồ): Học viên tự học, muốn ôn tập và hiểu sâu bài giảng thông qua thảo luận.
+  ```mermaid
+  flowchart TD
+      A([Trường hợp: Tự ôn tập qua video/slide]) --> B(Gặp thuật ngữ hoặc khái niệm khó)
+      B --> C{Nỗi đau hiện tại}
+      C -->|Học 1 mình| D[Thiếu người trao đổi, chán nản]
+      C -->|Tài liệu dài| E[Khó tự xâu chuỗi kiến thức]
+      D & E --> F[Mở tính năng Lớp Học Mô Phỏng]
+      F --> G(Học viên đặt câu hỏi)
+      G --> H[Bạn học ảo: Gợi ý ngây ngô/Socratic]
+      H --> I(Học viên phản biện / Tự suy nghĩ)
+      I --> J[Trợ giảng ảo: Can thiệp chốt kiến thức chuẩn]
+      J --> K([Mục tiêu đạt được: Hiểu sâu bài giảng, lấy lại động lực])
+      
+      style A fill:#f9f,stroke:#333,stroke-width:2px
+      style K fill:#bbf,stroke:#333,stroke-width:2px
+      style F fill:#dfd,stroke:#333,stroke-width:2px
+  ```
 - Core JTBD (không tên sản phẩm/AI trong câu): Thảo luận và giải đáp thắc mắc về tài liệu học tập để nắm vững kiến thức.
 - Problem statement (KHÔNG chữ AI): Học viên thường gặp khó khăn khi tự ôn tập một mình do thiếu người trao đổi, phản biện và hướng dẫn, dẫn đến việc hiểu sai hoặc không sâu kiến thức.
 - Evidence (chuẩn A và/hoặc B — log đầy đủ trong repo):
@@ -75,19 +91,28 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới
 
 ## §6. Bốn đường đi của trải nghiệm
 - Happy path: Học viên hỏi, Bạn học ảo đưa ra ý kiến ngây ngô/gợi mở, Trợ giảng ảo chốt lại kiến thức chuẩn xác dựa trên Knowledge base. · Low-confidence (②): Trợ lý hoặc bạn học ảo thông báo không có đủ thông tin trong bài giảng để trả lời. · Failure/không căn cứ (①): AI bịa ra kiến thức ngoài slide. · Correction (user sửa): Học viên đính chính lại thông tin hoặc yêu cầu Trợ giảng giải thích rõ hơn câu trả lời của Bạn học ảo.
-- Khi bị đòi ngoài phạm vi (③): Trợ giảng từ chối khéo léo và hướng học viên quay lại chủ đề bài giảng (Knowledge snippet). · Case đặc thù domain (④): 
+- Khi bị đòi ngoài phạm vi (③): Trợ giảng từ chối khéo léo và hướng học viên quay lại chủ đề bài giảng (Knowledge snippet). · Case đặc thù domain (④): Trợ giảng ảo chủ động can thiệp ngắt luồng nếu học viên hiểu sai kiến thức cốt lõi (bị bạn học ảo dẫn dắt sai), hoặc học viên có thể trực tiếp phản biện lại khi hệ thống hiểu lầm ý/bắt bẻ sai từ ngữ.
 
 ## §7. Kiểm thử
-- Chiều chất lượng + định nghĩa kiểm chứng được: Tính chính xác so với tài liệu (RAG), Tính phù hợp của vai trò (Persona: Trợ giảng nghiêm túc/chuẩn xác, Bạn học ngây ngô/gợi mở), Khả năng điều phối lượt nói (Turn-taking).
-- Golden set (≥20 case theo cơ cấu trong guide §2.6, file trong eval/): Đã chuẩn bị bộ ___ test cases trong `docs/golden-set.csv` (Kịch bản test - Hard tests).
-- Quality bar (chốt từ hạn chốt spec của khoá, giữ nguyên sau đó): "Đạt khi ≥ ___% qua bộ, và ___"
+- Chiều chất lượng + định nghĩa kiểm chứng được: 
+  - Tính chính xác (Groundedness/No Hallucination): Không bịa kiến thức ngoài luồng, không giải thích dài dòng nếu người dùng nhập câu vô nghĩa.
+  - Tính phù hợp của vai trò (Persona Consistency): Trợ giảng đưa gợi ý Socratic (không đọc đáp án thẳng), Bạn học ngây ngô thân thiện, Thầy giáo chốt kiến thức chuẩn mực.
+  - Khả năng điều phối (Intent Routing & Turn-taking): Gọi đúng Agent lên phát biểu dựa theo ý định của user.
+- Golden set (≥20 case theo cơ cấu trong guide §2.6, file trong eval/): Đã chuẩn bị bộ 22 test cases trong `eval/golden_set.csv` bao phủ đủ các lớp: Khó đoán (Ambiguity), Ngoài lề (Out of scope), Chuyên môn (Domain), và Thuyết giảng/Giao tiếp (Pedagogy/Interaction).
+- Quality bar (chốt từ hạn chốt spec của khoá, giữ nguyên sau đó): "Đạt khi ≥ 85% qua bộ, và KHÔNG có case nào vi phạm quy tắc đóng vai (Prompt Injection) hay bịa đặt kiến thức."
 - Kết quả các lượt chạy (bảng % — cập nhật đến trước CP6):
+  - **Lượt 1 (Baseline - Code gốc)**: 0/22 Pass (0%). Agent vi phạm ảo giác diện rộng (giải thích chuyên sâu cho câu chửi/tán gẫu vô nghĩa), bị lừa đổi vai, gọi nhầm Agent.
+  - **Lượt 2 (Sau khi sửa System Prompt & Intent Regex)**: 13/22 Pass (59%). Khắc phục triệt để lỗi Prompt Injection và Ảo giác (Agent đã biết hỏi lại thay vì đoán bừa). 9 case FAIL còn lại 100% là do hạn chế của Regex bắt nhầm từ khóa (vd: chữ "ví dụ", "giúp" làm hệ thống nhầm luồng). Hướng giải quyết tiếp theo là dùng LLM Router.
 
 ## §8. Phân công & kế hoạch
-- Phân công có tên: spec / evidence / prompt / code / demo
-- Willing users (≥2 tên) + kế hoạch vòng validation *(bonus, nếu làm)*:
-- Multi-prototype (nếu làm): trục khác biệt của ≥2 phương án + lý do chọn:
+- Phân công có tên: spec / evidence / prompt / code / demo: Đinh Tiến Cảnh - 2A202602918 đảm nhiệm frontend, backend. Ngô Kỳ Anh - 2A202602916 đảm nhiệm spec, evidence và prompt. Vũ Đức Minh - 2A202602895 đảm nhiệm prompt, test case và eval. Nguyễn Ngọc Vĩnh - 2A202602833. Khảo sát người dùng, khảo sát willing user, làm slide và demo.
+- Willing users (≥2 tên) + kế hoạch vòng validation *(bonus, nếu làm)*: Nguyễn Xuân Trường Giang - 2A202602446, Đinh Văn Hùng - 2A202602443, Nguyễn Thanh Phong - 2A202602843. Kế hoạch: Đưa giao diện Web cho 3 bạn đóng vai học viên học bài Attention, chat tự do trong 5 phút. Sau đó phỏng vấn nhanh xem sự xuất hiện của Bạn học ảo (Minh) có làm giảm áp lực học tập và Trợ giảng (Thảo) có gợi ý hiệu quả không.
+- Multi-prototype (nếu làm): trục khác biệt của ≥2 phương án + lý do chọn: Bỏ qua
 
 ## §9. Changelog
 | Thời điểm | Đổi gì | Vì sao (trỏ về feedback/case nào) |
-```
+| :--- | :--- | :--- |
+| **Lần 1 (Baseline)** | Thiết lập hệ thống Backend và Frontend cơ bản, tạo hàm `classify_user_intent` dùng chuỗi con (substring). | Chuẩn bị MVP cho dự án. |
+| **Lần 2 (Sau Eval 1)** | Đổi hàm `classify_user_intent` sang dùng Regex `\b` (Word Boundaries). | Lỗi nhận nhầm từ khóa (VD: chữ "tại" bị nhận nhầm thành "ta") làm Agent trả lời sai luồng (Case D1-D01, D1-S02). |
+| **Lần 3 (Sau Eval 1)** | Cắt bỏ các ví dụ cứng nhắc ("não bộ", "con mèo") trong System Prompt của Trợ giảng Thảo, thêm luật chống suy diễn cho Minh. | LLM bị ảo giác (Hallucination), tự giải thích kiến thức sâu xa khi user nhập câu vô nghĩa như "hả", "asds" (Case D1-A03, D1-A04) hoặc bị dính Prompt Injection (Case D1-R01). |
+| **Lần 4 (Sau Eval 1)** | Sửa lại file chấm điểm `run_eval.py` và `grade.py` để phân tích tên người gửi bằng Regex linh hoạt hơn. | Bộ Eval tự động báo FAIL toàn bộ do không parse được chữ "prof-tuan" (do thiếu dấu tiếng Việt) thành "TS. Tuấn". |
