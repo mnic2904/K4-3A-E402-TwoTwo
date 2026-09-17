@@ -59,7 +59,7 @@ export function ProductiveFailureView() {
           </button>
 
           <span className="text-xs font-bold uppercase tracking-wider text-[#0056D2] bg-blue-50 px-2.5 py-1 rounded border border-blue-100">
-            Coursera Lab · Productive Failure (Track D2)
+            Coursera Lab · Bài Tập Tương Tác Socratic
           </span>
         </div>
 

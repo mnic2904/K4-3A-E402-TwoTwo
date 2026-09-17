@@ -96,7 +96,7 @@ export function ProtegeView() {
           </button>
 
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded border border-emerald-200">
-            Coursera Graded Assignment · Protégé Effect (Track D3)
+            Coursera Assignment · Giảng Bài Cho Bạn Học (Protégé)
           </span>
         </div>
 
