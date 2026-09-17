@@ -22,10 +22,10 @@ function MainLayout() {
   }, [user, activeTab, setActiveTab, setIsAuthModalOpen]);
 
   return (
-    <div className="min-h-[100dvh] flex flex-col justify-between bg-[#f8fafc] text-slate-800 selection:bg-blue-600/20 selection:text-[#0056D2]">
-      <div>
+    <div className="min-h-[100dvh] flex flex-col justify-between bg-stone-100 text-stone-900 selection:bg-stone-200 selection:text-stone-950">
+      <div className="flex-1 flex flex-col">
         <Navbar />
-        <main className="w-full">
+        <main className="w-full flex-1">
           {activeTab === 'home' && <LandingView />}
           {activeTab === 'dashboard' && <DashboardView />}
           {activeTab === 'classroom' && <ClassroomView />}
@@ -35,7 +35,7 @@ function MainLayout() {
         </main>
       </div>
       
-      <Footer />
+      {activeTab !== 'classroom' && <Footer />}
       <AuthModal />
       <Toast />
     </div>
