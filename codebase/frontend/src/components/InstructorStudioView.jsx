@@ -2,23 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { 
   SlidersHorizontal, 
-  BarChart3, 
-  Users, 
-  ShieldAlert, 
-  CheckCircle2, 
   Save, 
-  Sparkles, 
-  BookOpen, 
-  Bot, 
-  Settings2,
-  FileText,
-  Activity
+  ArrowLeft,
+  Users,
+  Layers,
+  Award,
+  Activity,
+  Sparkles
 } from 'lucide-react';
 
 export function InstructorStudioView() {
-  const { showToast } = useAuth();
+  const { showToast, setActiveTab } = useAuth();
 
-  const [peerTemperature, setPeerTemperature] = useState(0.95);
+  const [peerTemperature, setPeerTemperature] = useState(0.85);
   const [taTemperature, setTaTemperature] = useState(0.70);
   const [instructorTemperature, setInstructorTemperature] = useState(0.30);
   const [analytics, setAnalytics] = useState(null);
@@ -50,155 +46,170 @@ export function InstructorStudioView() {
         })
       });
       if (res.ok) {
-        showToast("Đã lưu tham số", "Các tác tử trong lớp học đã được cập nhật hành vi mới thành công.", "success");
+        showToast("Đã lưu tham số", "Tham số hành vi tác tử đã được áp dụng.", "success");
       }
     } catch (e) {
-      showToast("Đã lưu tham số cục bộ", "Cấu hình tác tử đã được áp dụng.", "info");
+      showToast("Đã lưu tham số", "Cấu hình tác tử đã được cập nhật.", "info");
     }
   };
 
   return (
-    <div className="bg-[#f8fafc] min-h-[calc(100vh-64px)] py-8 text-left text-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="bg-stone-100 min-h-[calc(100vh-56px)] py-8 sm:py-12 text-left text-stone-900">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-8">
         
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0056D2] text-xs font-semibold mb-2">
-              <SlidersHorizontal className="w-3.5 h-3.5" />
-              Coursera Instructor Studio · Quản Trị Giảng Dạy
-            </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
-              Quản Trị Tác Tử & Báo Cáo Học Viên (Instructor Studio)
+            <button
+              onClick={() => setActiveTab('classroom')}
+              className="inline-flex items-center gap-2 text-sm font-bold text-stone-700 hover:text-stone-900 bg-white border border-stone-200 px-3.5 py-2 rounded-xl transition-all shadow-2xs mb-3 cursor-pointer"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Quay lại Lớp Học</span>
+            </button>
+            <h1 className="text-3xl sm:text-4xl font-black text-stone-900">
+              Instructor Studio & Analytics
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Điều phối hành vi tác tử và theo dõi ngộ nhận của học viên theo thời gian thực từ Backend Knowledge Engine.
+            <p className="text-base text-stone-600 mt-1">
+              Hiệu chỉnh tham số hành vi của các mô hình AI và theo dõi chỉ số lĩnh hội kiến thức của học viên.
             </p>
           </div>
 
           <button
             onClick={handleSaveSettings}
-            className="px-5 py-2.5 bg-[#0056D2] hover:bg-[#00419e] text-white font-bold text-xs rounded-lg shadow-xs flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
+            className="px-6 py-3.5 bg-stone-900 hover:bg-stone-800 text-white font-bold text-sm sm:text-base rounded-xl transition-all flex items-center gap-2 cursor-pointer shadow-md self-start sm:self-center"
           >
             <Save className="w-4 h-4" />
             <span>Lưu Tham Số Tác Tử</span>
           </button>
         </div>
 
-        {/* Real Overview Stats */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs">
-            <div className="text-xs text-slate-500 font-semibold mb-1">Học Viên Đang Hoạt Động</div>
-            <div className="text-2xl font-black text-slate-900 font-mono-code">
+        {/* Stats Grid */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div className="p-5 rounded-2xl bg-white border-2 border-stone-200 shadow-xs">
+            <div className="text-xs font-mono text-stone-500 font-bold flex items-center gap-1">
+              <Users className="w-3.5 h-3.5 text-blue-600" />
+              <span>Học Viên Hoạt Động</span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black font-mono text-stone-900 mt-1">
               {analytics?.total_active_learners || 1}
             </div>
-            <div className="text-[11px] text-[#0056D2] mt-2 font-medium">Phiên học trực tiếp kết nối</div>
           </div>
 
-          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs">
-            <div className="text-xs text-slate-500 font-semibold mb-1">Slide Bài Giảng Đã Nạp</div>
-            <div className="text-2xl font-black text-[#0056D2] font-mono-code">2 Giáo Trình</div>
-            <div className="text-[11px] text-slate-500 mt-2">Tổng cộng 58 trang bài giảng</div>
-          </div>
-
-          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs">
-            <div className="text-xs text-slate-500 font-semibold mb-1">Điểm Năng Lực Trung Bình</div>
-            <div className="text-2xl font-black text-emerald-600 font-mono-code">
-              {analytics?.average_mastery_score || 55}/100
+          <div className="p-5 rounded-2xl bg-white border-2 border-stone-200 shadow-xs">
+            <div className="text-xs font-mono text-stone-500 font-bold flex items-center gap-1">
+              <Layers className="w-3.5 h-3.5 text-purple-600" />
+              <span>Slide Giáo Trình</span>
             </div>
-            <div className="text-[11px] text-emerald-600 mt-2 font-medium">Thang đo Mastery Score</div>
+            <div className="text-2xl sm:text-3xl font-black font-mono text-stone-900 mt-1">
+              58 Slide
+            </div>
           </div>
 
-          <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs">
-            <div className="text-xs text-slate-500 font-semibold mb-1">Tác Tử Đang Hoạt Động</div>
-            <div className="text-2xl font-black text-amber-600 font-mono-code">3 Models</div>
-            <div className="text-[11px] text-slate-500 mt-2 font-medium">Instructor · TA · Peer</div>
+          <div className="p-5 rounded-2xl bg-white border-2 border-stone-200 shadow-xs">
+            <div className="text-xs font-mono text-stone-500 font-bold flex items-center gap-1">
+              <Award className="w-3.5 h-3.5 text-amber-500" />
+              <span>Mastery Trung Bình</span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black font-mono text-stone-900 mt-1">
+              {analytics?.average_mastery_score || 68}/100
+            </div>
+          </div>
+
+          <div className="p-5 rounded-2xl bg-white border-2 border-stone-200 shadow-xs">
+            <div className="text-xs font-mono text-stone-500 font-bold flex items-center gap-1">
+              <Activity className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Tác Tử AI Đang Chạy</span>
+            </div>
+            <div className="text-2xl sm:text-3xl font-black font-mono text-stone-900 mt-1">
+              3 Models
+            </div>
           </div>
         </div>
 
         {/* Agent Tuning */}
-        <div className="rounded-2xl p-6 sm:p-8 space-y-6 bg-white border border-slate-200 shadow-xs">
-          <div className="flex items-center gap-2">
-            <Settings2 className="w-5 h-5 text-[#0056D2]" />
-            <h2 className="text-lg font-bold text-slate-900">Hiệu Chỉnh Tham Số Sinh Ngẫu Nhiên Của Tác Tử</h2>
+        <div className="rounded-2xl p-6 sm:p-8 bg-white border-2 border-stone-200 space-y-6 shadow-xs">
+          <div className="flex items-center gap-2 text-xs font-mono text-stone-500 font-bold uppercase tracking-wider">
+            <SlidersHorizontal className="w-4 h-4 text-stone-700" />
+            <span>Hiệu chỉnh tham số Temperature & Mức độ sáng tạo</span>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* Peer */}
-            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+            <div className="p-5 rounded-xl bg-stone-50 border-2 border-stone-200 space-y-4">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-                <h3 className="text-sm font-bold text-amber-900">Bạn Học Minh (Peer Learner)</h3>
+                <span className="w-3 h-3 rounded-full bg-amber-500" />
+                <span className="font-extrabold text-base text-stone-900">Bạn học Minh</span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Tạo ngộ nhận tự nhiên từ nội dung slide để kích hoạt mô hình Protege/ICAP.
+              <p className="text-xs text-stone-600 leading-relaxed">
+                Độ ngẫu nhiên cao giúp bạn học thể hiện các ngộ nhận trực quan, tự nhiên của người mới học.
               </p>
-              <div>
-                <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-slate-600">Temperature (Sáng tạo)</span>
-                  <span className="font-bold text-amber-700 font-mono-code">{peerTemperature}</span>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-mono text-stone-700 font-bold">
+                  <span>Temperature:</span>
+                  <span className="text-stone-950 text-sm">{peerTemperature}</span>
                 </div>
-                <input 
-                  type="range" 
-                  min="0.1" 
-                  max="1.0" 
+                <input
+                  type="range"
+                  min="0.1"
+                  max="1.2"
                   step="0.05"
-                  value={peerTemperature} 
+                  value={peerTemperature}
                   onChange={(e) => setPeerTemperature(parseFloat(e.target.value))}
-                  className="w-full accent-amber-500"
+                  className="w-full cursor-pointer accent-amber-500"
                 />
               </div>
             </div>
 
             {/* TA */}
-            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+            <div className="p-5 rounded-xl bg-stone-50 border-2 border-stone-200 space-y-4">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#0056D2]" />
-                <h3 className="text-sm font-bold text-blue-900">Trợ Giảng Thảo (TA Socratic)</h3>
+                <span className="w-3 h-3 rounded-full bg-blue-600" />
+                <span className="font-extrabold text-base text-stone-900">Trợ giảng Thảo</span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Đặt câu hỏi gợi mở, không đưa đáp án trực tiếp nhằm duy trì vùng phát triển gần (ZPD).
+              <p className="text-xs text-stone-600 leading-relaxed">
+                Nhiệt độ cân bằng để đặt câu hỏi gợi mở theo phương pháp Socratic, không tiết lộ ngay đáp án.
               </p>
-              <div>
-                <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-slate-600">Temperature (Cân bằng)</span>
-                  <span className="font-bold text-[#0056D2] font-mono-code">{taTemperature}</span>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-mono text-stone-700 font-bold">
+                  <span>Temperature:</span>
+                  <span className="text-stone-950 text-sm">{taTemperature}</span>
                 </div>
-                <input 
-                  type="range" 
-                  min="0.1" 
-                  max="1.0" 
+                <input
+                  type="range"
+                  min="0.1"
+                  max="1.2"
                   step="0.05"
-                  value={taTemperature} 
+                  value={taTemperature}
                   onChange={(e) => setTaTemperature(parseFloat(e.target.value))}
-                  className="w-full accent-[#0056D2]"
+                  className="w-full cursor-pointer accent-blue-600"
                 />
               </div>
             </div>
 
             {/* Instructor */}
-            <div className="p-5 rounded-xl bg-slate-50 border border-slate-200 space-y-4">
+            <div className="p-5 rounded-xl bg-stone-50 border-2 border-stone-200 space-y-4">
               <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-purple-600" />
-                <h3 className="text-sm font-bold text-purple-900">TS. Tuấn (Instructor)</h3>
+                <span className="w-3 h-3 rounded-full bg-purple-600" />
+                <span className="font-extrabold text-base text-stone-900">TS. Tuấn</span>
               </div>
-              <p className="text-xs text-slate-600 leading-relaxed">
-                Đánh giá chuẩn xác, trích dẫn tài liệu chính thức theo mã slide [Txx-xxx].
+              <p className="text-xs text-stone-600 leading-relaxed">
+                Nhiệt độ thấp để đảm bảo câu trả lời luôn chuẩn xác về mặt học thuật, trích dẫn đúng slide.
               </p>
-              <div>
-                <div className="flex justify-between text-xs mb-1.5">
-                  <span className="text-slate-600">Temperature (Chính xác cao)</span>
-                  <span className="font-bold text-purple-700 font-mono-code">{instructorTemperature}</span>
+              <div className="space-y-2">
+                <div className="flex justify-between text-xs font-mono text-stone-700 font-bold">
+                  <span>Temperature:</span>
+                  <span className="text-stone-950 text-sm">{instructorTemperature}</span>
                 </div>
-                <input 
-                  type="range" 
-                  min="0.1" 
-                  max="1.0" 
+                <input
+                  type="range"
+                  min="0.1"
+                  max="1.2"
                   step="0.05"
-                  value={instructorTemperature} 
+                  value={instructorTemperature}
                   onChange={(e) => setInstructorTemperature(parseFloat(e.target.value))}
-                  className="w-full accent-purple-600"
+                  className="w-full cursor-pointer accent-purple-600"
                 />
               </div>
             </div>
