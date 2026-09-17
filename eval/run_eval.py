@@ -4,16 +4,21 @@ import httpx
 import asyncio
 from datetime import datetime
 import re
+import os
+import sys
 
-CSV_FILE = 'golden_set.csv'
-OUT_FILE = 'results.csv'
+# Ensure UTF-8 output on Windows console
+if sys.stdout and hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
+if sys.stderr and hasattr(sys.stderr, 'reconfigure'):
+    sys.stderr.reconfigure(encoding='utf-8')
+
+EVAL_DIR = os.path.dirname(os.path.abspath(__file__))
+CSV_FILE = os.path.join(EVAL_DIR, 'golden_set.csv')
+OUT_FILE = os.path.join(EVAL_DIR, 'results.csv')
 BASE_URL = 'http://localhost:8000'
 
 async def evaluate_row(row, client, run_id):
-    if row['pass_fail'] != '':
-        # Already evaluated, skip
-        return row
-    
     execution_mode = row['execution_mode']
     lesson_id = row['lesson_id']
     current_slide = int(row['current_slide'])
