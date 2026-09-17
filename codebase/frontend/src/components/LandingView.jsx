@@ -1,26 +1,15 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { useAuth } from '../context/AuthContext';
 import { LESSONS } from '../data/mockData';
 import { 
-  BookOpen, 
   ArrowRight, 
-  Play, 
-  FileText, 
-  Users,
-  Sparkles,
-  Layers,
-  GraduationCap,
-  MessageSquare,
-  Compass,
-  CheckCircle2,
-  HelpCircle,
-  BrainCircuit,
-  Bot
+  BookOpen, 
+  CheckCircle2, 
+  Layers
 } from 'lucide-react';
 
 export function LandingView() {
   const { setSelectedLesson, setActiveTab, requireAuth } = useAuth();
-  const [activePreviewTab, setActivePreviewTab] = useState('dialogue');
 
   const handleStartLesson = (lesson) => {
     requireAuth(() => {
@@ -30,243 +19,146 @@ export function LandingView() {
   };
 
   return (
-    <div className="bg-[#f8fafc] text-slate-800 min-h-[calc(100vh-56px)] flex flex-col justify-between text-left selection:bg-blue-100 selection:text-blue-900">
-      
-      {/* 1. HERO SECTION: ACADEMIC & HIGH-END EDITORIAL */}
-      <section className="relative overflow-hidden pt-10 sm:pt-16 pb-12 border-b border-slate-200/80 bg-white">
+    <div className="bg-[#FBFBFA] min-h-[calc(100vh-56px)] text-[#111111] text-left py-16 sm:py-24">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 space-y-16">
         
-        {/* Subtle grid pattern background */}
-        <div className="absolute inset-0 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:24px_24px] opacity-60 pointer-events-none" />
-        
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          
-          <div className="max-w-3xl space-y-5">
-            
-            {/* Academic Series Pill */}
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200/80 text-[#0056D2] text-xs font-bold tracking-tight">
-              <span className="w-2 h-2 rounded-full bg-[#0056D2] animate-pulse" />
-              <span>Coursera Advanced Deep Learning Series</span>
-            </div>
-
-            {/* Main Headline */}
-            <h1 className="text-3xl sm:text-5xl font-black text-slate-900 tracking-tight leading-[1.15]">
-              Học AI Chuyên Sâu Cùng <br className="hidden sm:inline" />
-              <span className="text-[#0056D2]">Lớp Học Đa Tác Tử</span> Thích Ứng
-            </h1>
-
-            {/* Sub-headline */}
-            <p className="text-base sm:text-lg text-slate-600 leading-relaxed font-normal">
-              Đọc slide bài giảng chuyên sâu kết hợp tương tác thời gian thực cùng Bạn học AI (phản biện ngộ nhận), Trợ giảng Socratic (gợi mở tư duy) và Giảng viên (chuẩn hóa kiến thức).
-            </p>
-
-            {/* Quick Metrics Bar */}
-            <div className="pt-2 flex flex-wrap items-center gap-6 sm:gap-10 text-xs sm:text-sm text-slate-600 font-medium">
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-blue-50 flex items-center justify-center text-[#0056D2] font-bold">
-                  2
-                </div>
-                <span>Giáo Trình Chuyên Sâu</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-700 font-bold">
-                  58
-                </div>
-                <span>Trang Slide Trực Quan</span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <div className="w-7 h-7 rounded-lg bg-purple-50 flex items-center justify-center text-purple-700 font-bold">
-                  3
-                </div>
-                <span>Tác Tử Đồng Hành</span>
-              </div>
-            </div>
-
+        {/* Editorial Hero */}
+        <div className="space-y-6 border-b border-[#EAEAEA] pb-16">
+          <div className="flex items-center gap-2 text-sm font-mono uppercase tracking-widest text-[#787774]">
+            <span className="w-2 h-2 rounded-full bg-[#111111]" />
+            <span>Môi trường học tập tương tác đa tác tử</span>
           </div>
 
-          {/* 2. SIGNATURE INTERACTIVE CLASSROOM PREVIEW (ĐIỂM NHẤN SẢN PHẨM) */}
-          <div className="mt-10 rounded-2xl border border-slate-200 bg-slate-900 text-white shadow-xl overflow-hidden">
-            
-            {/* Classroom Preview Header */}
-            <div className="bg-slate-800/90 px-4 py-3 border-b border-slate-700 flex flex-wrap items-center justify-between gap-3 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="w-3 h-3 rounded-full bg-red-500/80" />
-                <span className="w-3 h-3 rounded-full bg-amber-500/80" />
-                <span className="w-3 h-3 rounded-full bg-emerald-500/80" />
-                <span className="font-mono text-slate-300 font-bold ml-2">Mô Phỏng Trải Nghiệm Lớp Học Thực Tế</span>
-              </div>
+          <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight text-[#111111] leading-[1.15]">
+            Học tập qua tranh biện và phản biện đa tác tử
+          </h1>
 
-              <div className="flex items-center gap-1.5 text-slate-400 font-mono text-[11px]">
-                <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-                <span>Cơ chế Socratic & Phản Biện Ngộ Nhận</span>
-              </div>
-            </div>
+          <p className="text-lg sm:text-xl text-[#555555] leading-relaxed max-w-3xl">
+            Một không gian học tập trực tiếp với giáo trình chuẩn hóa. Sinh viên không chỉ đọc slide mà chủ động tương tác với ba tác tử mô phỏng theo mô hình S-P-I-C-E để phát hiện ngộ nhận, gợi mở tư duy và chuẩn hóa kiến thức.
+          </p>
 
-            {/* Simulation Preview Body */}
-            <div className="grid grid-cols-1 lg:grid-cols-12 divide-y lg:divide-y-0 lg:divide-x divide-slate-800 bg-slate-950">
-              
-              {/* Left Excerpt: Slide Snippet */}
-              <div className="lg:col-span-5 p-5 sm:p-6 space-y-4 bg-slate-900/50">
-                <div className="flex items-center justify-between text-xs text-slate-400 font-mono">
-                  <span>Slide 15 / 29 · Day 1</span>
-                  <span className="bg-blue-900/60 text-blue-300 px-2 py-0.5 rounded text-[10px]">Self-Attention</span>
-                </div>
-
-                <div className="p-4 rounded-xl bg-slate-900 border border-slate-700 font-mono text-xs sm:text-sm text-slate-200 space-y-2">
-                  <div className="text-amber-400 font-bold">Attention(Q, K, V) = softmax(Q·Kᵀ / √d_k) · V</div>
-                  <p className="text-[12px] text-slate-400 font-sans leading-relaxed">
-                    Khám phá lý do tại sao phép chia cho căn bậc hai của chiều không gian vector đặc trưng (√d_k) là điều kiện sống còn để tránh bão hòa gradient.
-                  </p>
-                </div>
-
-                <div className="text-[11px] text-slate-400 space-y-1 font-sans">
-                  <div className="font-semibold text-slate-300">Đặc tính độc quyền:</div>
-                  <div className="flex items-center gap-2">✓ Tự động trích xuất ngữ cảnh slide khi học viên cuộn trang</div>
-                  <div className="flex items-center gap-2">✓ Tác tử nắm bắt toàn bộ tiến trình học tập</div>
-                </div>
-              </div>
-
-              {/* Right Excerpt: Multi-Agent Conversation */}
-              <div className="lg:col-span-7 p-5 sm:p-6 space-y-3.5 bg-slate-950">
-                
-                {/* Peer Minh */}
-                <div className="p-3.5 rounded-xl bg-amber-950/30 border border-amber-800/40 text-left space-y-1">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-amber-400 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-amber-400" />
-                      Bạn học Minh (Ngộ nhận)
-                    </span>
-                    <span className="text-amber-500/70 font-mono">14:02</span>
-                  </div>
-                  <p className="text-xs text-slate-200 leading-relaxed font-sans">
-                    "Cậu ơi, sao Softmax scaling lại cần chia cho √d_k làm gì cho phức tạp nhỉ? Mình cứ nhân thẳng Q·Kᵀ thì đâu có mất mát thông tin gì?"
-                  </p>
-                </div>
-
-                {/* Socratic TA Thảo */}
-                <div className="p-3.5 rounded-xl bg-blue-950/30 border border-blue-800/40 text-left space-y-1">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-blue-400 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-blue-400" />
-                      Trợ giảng Thảo (Socratic Mentor)
-                    </span>
-                    <span className="text-blue-500/70 font-mono">14:03</span>
-                  </div>
-                  <p className="text-xs text-slate-200 leading-relaxed font-sans">
-                    "Minh thử nghĩ xem: Khi d_k rất lớn (ví dụ 512 chiều), tích vô hướng sẽ lớn đến mức nào? Và hàm Softmax ở những giá trị cực lớn sẽ có đạo hàm (gradient) tiến về bao nhiêu?"
-                  </p>
-                </div>
-
-                {/* Instructor TS. Tuấn */}
-                <div className="p-3.5 rounded-xl bg-purple-950/30 border border-purple-800/40 text-left space-y-1">
-                  <div className="flex items-center justify-between text-[11px]">
-                    <span className="font-bold text-purple-300 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-purple-400" />
-                      TS. Tuấn (Giảng viên)
-                    </span>
-                    <span className="text-purple-400/70 font-mono">14:04</span>
-                  </div>
-                  <p className="text-xs text-slate-200 leading-relaxed font-sans">
-                    "Chuẩn xác! Đó chính là hiện tượng <em>Vanishing Gradient</em>. Phép chia √d_k giúp đưa phương sai của tích về chuẩn 1, giữ cho mô hình huấn luyện ổn định."
-                  </p>
-                </div>
-
-              </div>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </section>
-
-      {/* 3. COURSES CURRICULUM GRID */}
-      <section className="py-12 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 w-full space-y-6">
-        
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-2">
-          <div>
-            <span className="text-xs font-bold uppercase tracking-wider text-[#0056D2]">Chương Trình Đào Tạo</span>
-            <h2 className="text-xl sm:text-2xl font-bold text-slate-900 mt-0.5">
-              Chọn Bài Giảng Để Bắt Đầu Học Ngay
-            </h2>
-          </div>
-          <span className="text-xs text-slate-500 font-medium">Bao gồm 2 Module chuyên sâu · 58 trang slide bài giảng</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {LESSONS.map((lesson, idx) => (
-            <div 
-              key={lesson.id}
-              className="bg-white border border-slate-200 hover:border-[#0056D2] rounded-2xl p-6 sm:p-7 shadow-xs hover:shadow-lg transition-all flex flex-col justify-between space-y-6 group"
+          <div className="pt-3 flex flex-wrap items-center gap-4">
+            <button
+              onClick={() => handleStartLesson(LESSONS[0])}
+              className="px-7 py-3.5 bg-[#111111] hover:bg-[#2A2A2A] text-white text-base font-bold rounded-md transition-all flex items-center gap-2.5 cursor-pointer active:scale-[0.99] shadow-xs"
             >
-              <div className="space-y-4">
-                
-                <div className="flex items-center justify-between text-xs">
-                  <span className="font-bold text-[#0056D2] bg-blue-50 px-3 py-1 rounded-full border border-blue-200/80">
-                    {lesson.week} · {lesson.day}
-                  </span>
-                  <span className="text-slate-500 font-mono text-xs font-bold bg-slate-100 px-2.5 py-1 rounded-md">
-                    29 Trang Bài Giảng
-                  </span>
-                </div>
+              <span>Bắt đầu Bài 1: AI Foundation</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
 
-                <div className="space-y-1.5">
-                  <h3 className="text-lg sm:text-xl font-bold text-slate-900 group-hover:text-[#0056D2] transition-colors">
-                    {lesson.title}
+            <button
+              onClick={() => setActiveTab('dashboard')}
+              className="px-6 py-3.5 bg-white hover:bg-[#F4F4F2] text-[#111111] text-base font-bold rounded-md border border-[#EAEAEA] transition-colors cursor-pointer"
+            >
+              Xem lộ trình học tập
+            </button>
+          </div>
+        </div>
+
+        {/* 3 Personas Architecture */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-[#EAEAEA] pb-3">
+            <h2 className="text-sm font-mono uppercase tracking-wider font-bold text-[#787774]">
+              Cấu trúc vai trò 3 tác tử
+            </h2>
+            <span className="text-xs font-mono text-[#999999]">S-P-I-C-E Framework</span>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+            
+            {/* Peer Card */}
+            <div className="bg-white border border-[#EAEAEA] rounded-lg p-7 space-y-3.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-[#FBF3DB] text-[#956400] border border-[#F2E4B8]">
+                  Bạn học
+                </span>
+                <span className="text-xs font-mono text-[#999999]">Minh</span>
+              </div>
+              <h3 className="text-lg font-bold text-[#111111]">Bạn học Minh</h3>
+              <p className="text-base text-[#666666] leading-relaxed">
+                Đóng vai học viên cùng lớp, đưa ra những giả định trực quan và ngộ nhận phổ biến để kích thích người học phản biện.
+              </p>
+            </div>
+
+            {/* TA Card */}
+            <div className="bg-white border border-[#EAEAEA] rounded-lg p-7 space-y-3.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-[#E1F3FE] text-[#1F6C9F] border border-[#C5E6FC]">
+                  Trợ giảng
+                </span>
+                <span className="text-xs font-mono text-[#999999]">Thảo</span>
+              </div>
+              <h3 className="text-lg font-bold text-[#111111]">Trợ giảng Thảo</h3>
+              <p className="text-base text-[#666666] leading-relaxed">
+                Áp dụng phương pháp Socratic, đưa ra câu hỏi gợi mở và liên hệ thực tế giúp người học tự khám phá nguyên lý cốt lõi.
+              </p>
+            </div>
+
+            {/* Instructor Card */}
+            <div className="bg-white border border-[#EAEAEA] rounded-lg p-7 space-y-3.5">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-mono font-bold uppercase tracking-wider px-2.5 py-1 rounded bg-[#F4EFFB] text-[#5E3D85] border border-[#E4D5F7]">
+                  Giảng viên
+                </span>
+                <span className="text-xs font-mono text-[#999999]">TS. Tuấn</span>
+              </div>
+              <h3 className="text-lg font-bold text-[#111111]">TS. Tuấn</h3>
+              <p className="text-base text-[#666666] leading-relaxed">
+                Tổng kết kiến thức học thuật, viện dẫn chính xác tài liệu slide gốc theo mã trích dẫn định danh minh bạch.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+        {/* Course Deck */}
+        <div className="space-y-6">
+          <div className="flex items-center justify-between border-b border-[#EAEAEA] pb-3">
+            <h2 className="text-sm font-mono uppercase tracking-wider font-bold text-[#787774]">
+              Danh mục giáo trình
+            </h2>
+            <span className="text-xs font-mono text-[#999999]">2 Học phần</span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {LESSONS.map((l) => (
+              <div 
+                key={l.id}
+                className="bg-white border border-[#EAEAEA] hover:border-[#CCCCCC] rounded-lg p-7 space-y-5 transition-colors flex flex-col justify-between"
+              >
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between text-xs font-mono text-[#787774]">
+                    <span className="font-bold text-[#111111] text-sm">{l.day}</span>
+                    <span className="font-semibold">{l.totalPages} trang slide</span>
+                  </div>
+
+                  <h3 className="text-xl font-bold text-[#111111] leading-snug">
+                    {l.title}
                   </h3>
-                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    {lesson.id === 'lesson-01' 
-                      ? 'Đi sâu vào cơ chế Self-Attention Q-K-V, Byte-Pair Encoding (BPE), Softmax Scaling và tính toán kinh tế Token trong các hệ thống LLM hiện đại.'
-                      : 'Đóng khung bài toán AI, phương pháp phân định Rule-based vs Machine Learning, tính toán Cost of Error và thiết kế vòng lặp Human-in-the-loop.'}
+
+                  <p className="text-base text-[#666666] leading-relaxed">
+                    {l.id === 'lesson-01'
+                      ? 'Kiến trúc Transformer, cơ chế Self-Attention đa đầu, Byte-Pair Encoding (BPE) và chuẩn hóa Softmax Scaling.'
+                      : 'Định hình bài toán AI, ma trận Cost of Error, phân định Rule-based vs Machine Learning và phương pháp Human-in-the-loop.'}
                   </p>
                 </div>
 
-                {/* Key Concepts Tags */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
-                  {lesson.id === 'lesson-01' ? (
-                    <>
-                      <span className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">Q-K-V Attention</span>
-                      <span className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">Softmax Scaling</span>
-                      <span className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">BPE Tokenizer</span>
-                    </>
-                  ) : (
-                    <>
-                      <span className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">Problem Framing</span>
-                      <span className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">Cost of Error</span>
-                      <span className="text-[11px] font-semibold bg-slate-100 text-slate-700 px-2.5 py-1 rounded-md">Human-in-the-loop</span>
-                    </>
-                  )}
+                <div className="pt-4 border-t border-[#F0F0F0] flex items-center justify-between">
+                  <span className="text-xs font-mono text-[#888888]">Giáo trình chính thức</span>
+                  <button
+                    onClick={() => handleStartLesson(l)}
+                    className="px-5 py-2.5 bg-[#111111] hover:bg-[#2A2A2A] text-white text-sm font-bold rounded-md transition-colors flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>Vào lớp</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
                 </div>
-
               </div>
-
-              <button
-                onClick={() => handleStartLesson(lesson)}
-                className="w-full py-3.5 rounded-xl bg-[#0056D2] hover:bg-[#00419e] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all shadow-md active:scale-98 cursor-pointer"
-              >
-                <Play className="w-4 h-4 fill-current" />
-                <span>Vào Lớp Học: {lesson.day}</span>
-              </button>
-            </div>
-          ))}
-        </div>
-
-      </section>
-
-      {/* 4. FOOTER NOTE */}
-      <footer className="py-6 text-center text-xs text-slate-500 border-t border-slate-200 bg-white">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div>Coursera AI Academy © 2026. Tất cả quyền được bảo lưu.</div>
-          <div className="flex items-center gap-4 text-[11px]">
-            <span>Mô hình đào tạo Socratic</span>
-            <span>·</span>
-            <span>Đồng hành cùng học viên</span>
+            ))}
           </div>
         </div>
-      </footer>
 
+      </div>
     </div>
   );
 }
