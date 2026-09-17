@@ -181,6 +181,8 @@ class AgentService:
             "citation": citation,
             "primary_speaker": "peer-minh",
             "message": minh_text,
+            "sender": "peer-minh",
+            "text": minh_text,
             "difficulty": difficulty,
             "student_level": student_level,
             "icap_target": "Constructive"

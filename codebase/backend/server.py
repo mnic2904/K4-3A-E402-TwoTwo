@@ -9,6 +9,7 @@ FastAPI Server supporting:
 
 import sys
 import os
+import re
 from typing import List, Dict, Any, Optional
 from fastapi import FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
@@ -161,21 +162,21 @@ def classify_user_intent(user_input: str) -> str:
     
     # 1. Ask for hint / guidance / TA help (Highest Priority Check)
     hint_keywords = [
-        "ta", "trợ giảng", "thảo", "gợi ý", "hint", "khó", "hướng dẫn", "chỉ cho", "chỉ em", "chỉ mình", "bế tắc",
+        r"\bta\b", "trợ giảng", "thảo", "gợi ý", "hint", "khó", "hướng dẫn", "chỉ cho", "chỉ em", "chỉ mình", "bế tắc",
         "giúp", "cứu", "chưa hiểu", "chưa rõ", "làm sao", "nhờ", "ví dụ", "sao ta"
     ]
-    if any(k in text for k in hint_keywords):
+    if any(re.search(k if '\\b' in k else rf"\b{k}\b", text) for k in hint_keywords):
         return "ASK_HINT"
 
     # 2. Ask professor directly
     instructor_keywords = [
-        "thầy", "thầy tuấn", "giảng viên", "nhờ thầy", "thầy giải thích", "thầy chốt", "hỏi thầy", "đúng không"
+        "thầy", "thầy tuấn", "giảng viên", "nhờ thầy", "thầy giải thích", "thầy chốt", "hỏi thầy", "đúng không", "xác nhận giúp"
     ]
-    if any(k in text for k in instructor_keywords):
+    if any(re.search(rf"\b{k}\b", text) for k in instructor_keywords):
         return "ASK_INSTRUCTOR"
 
     # 3. Simple casual / greetings only
-    casual_words = ["chào", "hello", "hi", "từ từ", "chờ tí", "đợi tí", "gì cơ"]
+    casual_words = ["chào", "hello", "hi", "từ từ", "chờ tí", "đợi tí", "gì cơ", "hả", "ok", "dạ"]
     if any(w == text for w in casual_words) or (len(text) < 5 and text not in ["học", "qkv", "bpe", "loss"]):
         return "META_OR_CLARIFY"
 
@@ -209,7 +210,7 @@ async def process_chat_turn(req: ChatTurnRequest):
             messages=req.messages,
             lesson_context=lesson_context,
             current_slide=req.current_slide,
-            prompt_instruction="Học viên đang kêu khó / nhờ trợ giúp. Hãy đưa ra 1 gợi ý so sánh thực tế ngắn gọn (ví dụ não bộ và dữ liệu thực tế, hoặc cơ chế Q-K-V) để bạn học Minh và Học viên cùng nắm bắt."
+            prompt_instruction="Học viên đang kêu khó / nhờ trợ giúp. Hãy phản hồi trực tiếp vào nội dung người học vừa nói, đưa ra 1 gợi ý so sánh hoặc câu hỏi định hướng (Socratic hint) liên quan TRỰC TIẾP đến phần học viên đang thắc mắc, không nói thẳng đáp án."
         )
 
         # 2. Peer Minh reacts to TA's hint
@@ -249,7 +250,8 @@ async def process_chat_turn(req: ChatTurnRequest):
             role="peer",
             messages=req.messages,
             lesson_context=lesson_context,
-            current_slide=req.current_slide
+            current_slide=req.current_slide,
+            prompt_instruction="Người dùng vừa có một câu nói ngắn gọn (chào hỏi, ngập ngừng, hoặc không rõ nghĩa). Hãy phản hồi lại thật ngắn gọn (chào lại hoặc hỏi xem họ cần giúp gì về bài học), tuyệt đối không tự suy diễn và không giải thích kiến thức."
         )
 
     else: # EXPLANATION
