@@ -1,0 +1,9 @@
+.env
+/tracks/
+.agents
+.aider-desk
+data
+skills-lock.json
+node_modules
+__pycache__
+*.pdf
