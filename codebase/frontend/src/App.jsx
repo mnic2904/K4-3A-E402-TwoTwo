@@ -12,7 +12,14 @@ import { Toast } from './components/Toast';
 import { Footer } from './components/Footer';
 
 function MainLayout() {
-  const { activeTab } = useAuth();
+  const { activeTab, user, setActiveTab, setIsAuthModalOpen } = useAuth();
+
+  React.useEffect(() => {
+    if (!user && activeTab !== 'home') {
+      setActiveTab('home');
+      setIsAuthModalOpen(true);
+    }
+  }, [user, activeTab, setActiveTab, setIsAuthModalOpen]);
 
   return (
     <div className="min-h-[100dvh] flex flex-col justify-between bg-[#f8fafc] text-slate-800 selection:bg-blue-600/20 selection:text-[#0056D2]">
