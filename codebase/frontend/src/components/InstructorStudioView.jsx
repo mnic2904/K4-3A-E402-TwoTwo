@@ -66,7 +66,7 @@ export function InstructorStudioView() {
           <div>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-[#0056D2] text-xs font-semibold mb-2">
               <SlidersHorizontal className="w-3.5 h-3.5" />
-              Coursera Instructor & Analytics Studio (Track D.1)
+              Coursera Instructor Studio · Quản Trị Giảng Dạy
             </div>
             <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
               Quản Trị Tác Tử & Báo Cáo Học Viên (Instructor Studio)
@@ -78,7 +78,7 @@ export function InstructorStudioView() {
 
           <button
             onClick={handleSaveSettings}
-            className="px-5 py-2.5 bg-[#0056D2] hover:bg-[#00419e] text-white font-bold text-xs rounded-lg shadow-xs flex items-center gap-2 transition-all active:scale-95"
+            className="px-5 py-2.5 bg-[#0056D2] hover:bg-[#00419e] text-white font-bold text-xs rounded-lg shadow-xs flex items-center gap-2 transition-all active:scale-95 cursor-pointer"
           >
             <Save className="w-4 h-4" />
             <span>Lưu Tham Số Tác Tử</span>
@@ -97,8 +97,8 @@ export function InstructorStudioView() {
 
           <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs">
             <div className="text-xs text-slate-500 font-semibold mb-1">Slide Bài Giảng Đã Nạp</div>
-            <div className="text-2xl font-black text-[#0056D2] font-mono-code">2 PDFs</div>
-            <div className="text-[11px] text-slate-500 mt-2">d1 & d2 slide hackathon (58 trang)</div>
+            <div className="text-2xl font-black text-[#0056D2] font-mono-code">2 Giáo Trình</div>
+            <div className="text-[11px] text-slate-500 mt-2">Tổng cộng 58 trang bài giảng</div>
           </div>
 
           <div className="p-5 rounded-xl bg-white border border-slate-200 shadow-xs">
