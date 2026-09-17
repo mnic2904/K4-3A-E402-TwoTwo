@@ -152,36 +152,31 @@ async def track_slide(req: TrackSlideRequest):
 def classify_user_intent(user_input: str) -> str:
     """
     Classifies student message into:
-    - 'ASK_HINT': Asking TA / system for a hint, guidance, expressing difficulty ('gợi ý', 'khó quá', 'hướng dẫn', 'hint', 'chưa biết làm sao')
+    - 'ASK_HINT': Asking TA / system for a hint, guidance, expressing difficulty ('nhờ ta', 'gợi ý', 'khó quá', 'hướng dẫn', 'hint', 'giúp')
     - 'ASK_INSTRUCTOR': Explicitly asking the professor ('thầy', 'thầy tuấn', 'giảng viên', 'chốt đáp án')
-    - 'META_OR_CLARIFY': Meta comments, casual chat, 'hỏi từng câu', 'không biết', 'từ từ', 'là sao'
-    - 'EXPLANATION': Substantive attempt to answer/explain the concept
+    - 'META_OR_CLARIFY': Casual greetings, simple acknowledgments ('chào', 'hello', 'ok')
+    - 'EXPLANATION': Attempt to answer/explain the concept
     """
     text = user_input.strip().lower()
     
-    # 1. Ask for hint / guidance / TA help
+    # 1. Ask for hint / guidance / TA help (Highest Priority Check)
     hint_keywords = [
-        "gợi ý", "hint", "khó quá", "hướng dẫn", "chỉ cho", "chỉ em", "chỉ mình", "bế tắc",
-        "giúp với", "giúp em", "giúp mình", "trợ giảng", "ta ơi", "anh ta", "chị thảo", "cô thảo",
-        "làm sao để", "cho xin ví dụ", "gợi ý giúp"
+        "ta", "trợ giảng", "thảo", "gợi ý", "hint", "khó", "hướng dẫn", "chỉ cho", "chỉ em", "chỉ mình", "bế tắc",
+        "giúp", "cứu", "chưa hiểu", "chưa rõ", "làm sao", "nhờ", "ví dụ", "sao ta"
     ]
     if any(k in text for k in hint_keywords):
         return "ASK_HINT"
 
     # 2. Ask professor directly
     instructor_keywords = [
-        "thầy ơi", "thầy tuấn", "giảng viên", "nhờ thầy", "thầy giải thích", "thầy chốt", "hỏi thầy"
+        "thầy", "thầy tuấn", "giảng viên", "nhờ thầy", "thầy giải thích", "thầy chốt", "hỏi thầy", "đúng không"
     ]
     if any(k in text for k in instructor_keywords):
         return "ASK_INSTRUCTOR"
 
-    # 3. Meta or non-answer phrases
-    meta_phrases = [
-        "hỏi từng câu", "hỏi câu nào", "từ từ", "chờ tí", "đợi tí", "gì cơ", "là sao",
-        "không biết", "k biết", "chịu", "chưa rõ", "chưa hiểu", "sao lại thế", "tại sao",
-        "nói lại", "bạn nói đi", "hỏi một câu thôi", "hỏi lại đi", "chào bạn", "hello", "hi"
-    ]
-    if any(p in text for p in meta_phrases) or len(text) < 12:
+    # 3. Simple casual / greetings only
+    casual_words = ["chào", "hello", "hi", "từ từ", "chờ tí", "đợi tí", "gì cơ"]
+    if any(w == text for w in casual_words) or (len(text) < 5 and text not in ["học", "qkv", "bpe", "loss"]):
         return "META_OR_CLARIFY"
 
     # 4. Default to substantive explanation
@@ -208,23 +203,45 @@ async def process_chat_turn(req: ChatTurnRequest):
     is_resolved = False
 
     if intent == "ASK_HINT":
-        # TA gives a Socratic hint without revealing the full answer
+        # 1. TA gives a direct Socratic hint based on student inquiry and Minh's question
         ta_res = await agent_service.generate_agent_response(
             role="ta",
             messages=req.messages,
             lesson_context=lesson_context,
-            current_slide=req.current_slide
+            current_slide=req.current_slide,
+            prompt_instruction="Học viên đang kêu khó / nhờ trợ giúp. Hãy đưa ra 1 gợi ý so sánh thực tế ngắn gọn (ví dụ não bộ và dữ liệu thực tế, hoặc cơ chế Q-K-V) để bạn học Minh và Học viên cùng nắm bắt."
         )
 
+        # 2. Peer Minh reacts to TA's hint
+        if ta_res:
+            peer_res = await agent_service.generate_agent_response(
+                role="peer",
+                messages=req.messages + [{"sender": ta_res["sender"], "text": ta_res["text"]}],
+                lesson_context=lesson_context,
+                current_slide=req.current_slide,
+                prompt_instruction="Bạn vừa nghe Trợ giảng Thảo gợi ý. Hãy reo lên một liên tưởng ngắn gọn hoặc hỏi bạn học tiếp theo gợi ý đó."
+            )
+
     elif intent == "ASK_INSTRUCTOR":
-        # Student explicitly asked Instructor
+        # 1. Student explicitly asked Instructor TS. Tuấn
         instructor_res = await agent_service.generate_agent_response(
             role="instructor",
             messages=req.messages,
             lesson_context=lesson_context,
-            current_slide=req.current_slide
+            current_slide=req.current_slide,
+            prompt_instruction="Học viên trực tiếp nhờ Thầy giải thích. Hãy chốt lại bản chất học thuật chuẩn xác, đĩnh đạc, ngắn gọn kèm mã trích dẫn slide."
         )
         is_resolved = True
+
+        # 2. Peer Minh acknowledges
+        if instructor_res:
+            peer_res = await agent_service.generate_agent_response(
+                role="peer",
+                messages=req.messages + [{"sender": instructor_res["sender"], "text": instructor_res["text"]}],
+                lesson_context=lesson_context,
+                current_slide=req.current_slide,
+                prompt_instruction="Bạn vừa nghe Thầy Tuấn giảng giải. Hãy cảm ơn Thầy và tóm tắt lại 1 ý hiểu nhanh."
+            )
 
     elif intent == "META_OR_CLARIFY":
         # Only Peer Minh responds to meta-conversations / clarifies his question
@@ -236,41 +253,54 @@ async def process_chat_turn(req: ChatTurnRequest):
         )
 
     else: # EXPLANATION
-        # 1. Peer response
+        # 1. Peer response to student explanation
         peer_res = await agent_service.generate_agent_response(
             role="peer",
             messages=req.messages,
             lesson_context=lesson_context,
-            current_slide=req.current_slide
+            current_slide=req.current_slide,
+            prompt_instruction="Học viên vừa giải thích cho bạn. Hãy phản hồi tự nhiên xem bạn đã hiểu ra chưa hoặc có điểm nào ấn tượng."
         )
 
-        # 2. TA Socratic response
-        ta_res = await agent_service.generate_agent_response(
-            role="ta",
-            messages=req.messages + [{"sender": peer_res["sender"], "text": peer_res["text"]}],
-            lesson_context=lesson_context,
-            current_slide=req.current_slide
-        )
-
-        # 3. TS. Tuấn verification
+        # 2. TS. Tuấn validates & awards mastery
         is_resolved = True
         instructor_res = await agent_service.generate_agent_response(
             role="instructor",
-            messages=req.messages + [
-                {"sender": peer_res["sender"], "text": peer_res["text"]},
-                {"sender": ta_res["sender"], "text": ta_res["text"]}
-            ],
+            messages=req.messages + [{"sender": peer_res["sender"], "text": peer_res["text"]}],
             lesson_context=lesson_context,
-            current_slide=req.current_slide
+            current_slide=req.current_slide,
+            prompt_instruction="Đánh giá lời giải thích của học viên cho bạn Minh. Khẳng định điểm đúng và chuẩn hóa kiến thức kèm mã trích dẫn slide."
         )
         
         # Reward mastery points based on slide difficulty
         diff_points = 25 if (slide_info and slide_info.get("difficulty") == "Hard") else 15
         tracker.update_mastery(req.student_id, req.lesson_id, points=diff_points)
 
+    # Build sequential list of agent responses based on dialogue flow
+    ordered_responses = []
+    if intent == "ASK_HINT":
+        if ta_res:
+            ordered_responses.append(ta_res)
+        if peer_res:
+            ordered_responses.append(peer_res)
+    elif intent == "ASK_INSTRUCTOR":
+        if instructor_res:
+            ordered_responses.append(instructor_res)
+        if peer_res:
+            ordered_responses.append(peer_res)
+    elif intent == "META_OR_CLARIFY":
+        if peer_res:
+            ordered_responses.append(peer_res)
+    else: # EXPLANATION
+        if peer_res:
+            ordered_responses.append(peer_res)
+        if instructor_res:
+            ordered_responses.append(instructor_res)
+
     student_profile = tracker.get_student_profile(req.student_id, req.lesson_id)
 
     return {
+        "ordered_responses": ordered_responses,
         "peer_response": peer_res,
         "ta_response": ta_res,
         "instructor_response": instructor_res,
