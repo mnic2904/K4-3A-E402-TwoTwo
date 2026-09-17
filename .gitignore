@@ -7,3 +7,4 @@ skills-lock.json
 node_modules
 __pycache__
 *.pdf
+dist
