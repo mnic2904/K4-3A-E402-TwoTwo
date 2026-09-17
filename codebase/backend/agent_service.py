@@ -2,9 +2,9 @@
 Multi-Agent Orchestration Service (Track D.1)
 Coordinates the 3 distinct AI models for Instructor, TA, and Peer Learner.
 Provides:
-1. Dynamic Adaptive Checkpoint Generation (Zero mockdata - generated from real slide content + student mastery level)
-2. Live Multi-Agent Socratic Debate & Evaluation
-3. Resilient OpenAI-compatible / 9router integration with dual JSON/SSE stream handling
+1. Context-Aware Multi-Agent Dialogue: Every agent observes the full conversation transcript and responds coherently.
+2. Dynamic Adaptive Checkpoint Generation based on real slide content.
+3. Resilient 9router / OpenAI-compatible integration with dual JSON/SSE stream handling.
 """
 
 import os
@@ -43,13 +43,34 @@ class AgentService:
         print(f"  - Peer Learner: {env['model_peer']}")
         print(f"  - Base URL / 9router: {self.base_url}")
 
+    def _build_classroom_transcript(self, messages: List[Dict[str, Any]]) -> str:
+        """
+        Formats message list into an unambiguous, speaker-tagged classroom transcript.
+        """
+        lines = []
+        speaker_map = {
+            "user": "Học viên (Người dùng)",
+            "peer-minh": "Bạn học Minh",
+            "ta-thao": "Trợ giảng Thảo",
+            "prof-tuan": "TS. Tuấn (Giảng viên)"
+        }
+
+        for m in messages[-8:]:
+            sender_key = m.get("sender", "user")
+            speaker_name = speaker_map.get(sender_key, "Học viên")
+            text = m.get("text", "").strip()
+            if text:
+                lines.append(f"[{speaker_name}]: {text}")
+
+        return "\n".join(lines) if lines else "[Chưa có trao đổi nào trước đó]"
+
     async def _call_openai_compatible_api(
         self, 
         model: str, 
         system_prompt: str, 
-        messages: List[Dict[str, Any]], 
+        user_prompt: str, 
         temperature: float,
-        max_tokens: int = 300
+        max_tokens: int = 250
     ) -> Optional[str]:
         """
         Calls 9router or OpenAI-compatible endpoint with timeout and dual JSON/SSE handling.
@@ -67,27 +88,10 @@ class AgentService:
             "Content-Type": "application/json"
         }
 
-        # Build message history for OpenAI / Gemini format ensuring valid alternating turns
-        api_messages = [{"role": "system", "content": system_prompt}]
-        cleaned_turns = []
-        for m in messages[-6:]:
-            role = "assistant" if m.get("sender") in ["peer-minh", "ta-thao", "prof-tuan"] else "user"
-            text = m.get("text", "").strip()
-            if not text:
-                continue
-            if cleaned_turns and cleaned_turns[-1]["role"] == role:
-                cleaned_turns[-1]["content"] += f"\n{text}"
-            else:
-                cleaned_turns.append({"role": role, "content": text})
-
-        # Ensure last message is from user for valid generation turn
-        if cleaned_turns and cleaned_turns[-1]["role"] == "assistant":
-            cleaned_turns.append({"role": "user", "content": "Hãy phản hồi tiếp tục theo đúng vai trò của bạn."})
-
-        if not cleaned_turns:
-            cleaned_turns.append({"role": "user", "content": "Bắt đầu bài học."})
-
-        api_messages.extend(cleaned_turns)
+        api_messages = [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ]
 
         payload = {
             "model": model,
@@ -137,9 +141,7 @@ class AgentService:
         student_mastery: int = 40
     ) -> Dict[str, Any]:
         """
-        Dynamically generates a contextual misconception / inquiry from Peer Minh based on the
-        actual text of the slide and the learner's current mastery level.
-        Zero mockdata: real-time LLM generation.
+        Generates a contextual misconception / inquiry from Peer Minh based on real slide content.
         """
         env = get_env_vars()
         slide_title = slide_info.get("title", f"Slide {slide_info.get('page')}")
@@ -148,26 +150,27 @@ class AgentService:
         difficulty = slide_info.get("difficulty", "Medium")
 
         system_prompt = (
-            f"Bạn là Minh, bạn học cùng lớp trong hệ thống VLearn (Track D.1).\n"
+            f"{PROMPT_PEER}\n\n"
+            f"--- BỐI CẢNH BÀI HỌC ---\n"
             f"Người học đang ở trình độ: {student_level} (Mastery: {student_mastery}/100).\n"
-            f"Người học vừa chuyển đến Slide {slide_info.get('page')}: '{slide_title}'.\n"
-            f"Nội dung slide: \"{slide_content[:350]}\".\n\n"
-            f"QUY ĐỊNH ĐỊNH DẠNG ĐẦU RA:\n"
-            f"- Hãy đặt 1 câu hỏi ngây ngô hoặc nêu 1 ngộ nhận trực quan tự nhiên về nội dung slide này để bạn học giải thích giúp.\n"
-            f"- BẮT BUỘC ĐỘ DÀI: 1 đến 2 câu ngắn gọn (tối đa 40 từ).\n"
-            f"- Xưng hô 'cậu - tớ' hoặc 'mình - bạn' thân mật, không dùng văn phong AI."
+            f"Slide {slide_info.get('page')}: '{slide_title}'.\n"
+            f"Nội dung trọng tâm: \"{slide_content[:350]}\".\n"
+        )
+
+        user_prompt = (
+            f"Hãy đặt 1 câu hỏi ngây thơ hoặc nêu 1 ngộ nhận trực quan tự nhiên về nội dung Slide {slide_info.get('page')} này "
+            f"để bạn học giải thích giúp bạn. Bắt buộc dài 1 đến 2 câu ngắn gọn, xưng hô cậu - tớ/mình - bạn."
         )
 
         minh_text = await self._call_openai_compatible_api(
             model=env["model_peer"],
             system_prompt=system_prompt,
-            messages=[{"role": "user", "content": f"Minh ơi, bạn thấy nội dung trang Slide {slide_info.get('page')} này thế nào?"}],
+            user_prompt=user_prompt,
             temperature=0.85,
-            max_tokens=100
+            max_tokens=90
         )
 
         if not minh_text:
-            # Fallback based on real slide text if API unreachable
             minh_text = f"Ủa cậu ơi, mình đang xem Slide {slide_info.get('page')} về '{slide_title}', phần này áp dụng thế nào vậy cậu giải thích giúp mình với?"
 
         return {
@@ -188,68 +191,83 @@ class AgentService:
         role: str, # 'instructor' | 'ta' | 'peer'
         messages: List[Dict[str, Any]], 
         lesson_context: str = "",
-        current_slide: int = 14
+        current_slide: int = 14,
+        prompt_instruction: str = ""
     ) -> Dict[str, Any]:
         """
-        Dispatches request to the distinct model for the specified role.
-        Evaluates student response against real slide content.
+        Dispatches request to the distinct model for the specified role with the full classroom transcript.
         """
         env = get_env_vars()
-        self.api_key = env["api_key"]
-        self.base_url = env["base_url"]
-
+        transcript = self._build_classroom_transcript(messages)
         citation_code = f"T01-{current_slide:03d}" if "lesson-01" in lesson_context.lower() else f"T02-{current_slide:03d}"
 
         if role == 'instructor':
             model_name = env["model_instructor"]
             system_prompt = (
                 f"{PROMPT_INSTRUCTOR}\n\n"
-                f"--- THÔNG TIN TIẾT HỌC HIỆN TẠI ---\n"
-                f"Ngữ cảnh: {lesson_context}\n"
+                f"--- BỐI CẢNH BÀI HỌC ---\n"
+                f"{lesson_context}\n"
                 f"Slide hiện tại: Trang {current_slide}\n"
-                f"Mã trích dẫn bắt buộc sử dụng: [{citation_code}]\n\n"
-                f"LƯU Ý: Giữ câu trả lời súc tích trong 80 - 150 từ, định dạng Markdown rõ ràng, kèm mã trích dẫn [{citation_code}]."
+                f"Mã trích dẫn bắt buộc: [{citation_code}]"
+            )
+            user_prompt = (
+                f"--- DIỄN BIẾN LỚP HỌC VỪA QUA ---\n"
+                f"{transcript}\n\n"
+                f"--- YÊU CẦU CHO TS. TUẤN ---\n"
+                f"{prompt_instruction or 'Hãy đọc kỹ diễn biến hội thoại ở trên và đưa ra đánh giá, chuẩn hóa kiến thức chuẩn xác, kèm mã trích dẫn [' + citation_code + '].'}"
             )
             temperature = 0.3
-            max_tokens = 250
+            max_tokens = 200
             agent_id = 'prof-tuan'
             agent_name = 'TS. Tuấn (GDE)'
+
         elif role == 'ta':
             model_name = env["model_ta"]
             system_prompt = (
                 f"{PROMPT_TA}\n\n"
-                f"--- THÔNG TIN TIẾT HỌC HIỆN TẠI ---\n"
-                f"Ngữ cảnh: {lesson_context}\n"
-                f"Slide hiện tại: Trang {current_slide}\n\n"
-                f"LƯU Ý: Phản hồi Socratic đúng 1 - 2 câu (dưới 50 từ), không nói đáp án, đặt 1 câu hỏi định hướng."
+                f"--- BỐI CẢNH BÀI HỌC ---\n"
+                f"{lesson_context}\n"
+                f"Slide hiện tại: Trang {current_slide}"
+            )
+            user_prompt = (
+                f"--- DIỄN BIẾN LỚP HỌC VỪA QUA ---\n"
+                f"{transcript}\n\n"
+                f"--- YÊU CẦU CHO TRỢ GIẢNG THẢO ---\n"
+                f"{prompt_instruction or 'Hãy đọc kỹ diễn biến hội thoại ở trên. Phản hồi trực tiếp vào nội dung người học vừa nói, đưa ra 1 gợi ý so sánh thực tế ngắn gọn để dẫn dắt, không nói thẳng đáp án.'}"
             )
             temperature = 0.7
             max_tokens = 120
             agent_id = 'ta-thao'
             agent_name = 'Trợ giảng Thảo'
-        else:
+
+        else: # peer
             model_name = env["model_peer"]
             system_prompt = (
                 f"{PROMPT_PEER}\n\n"
-                f"--- THÔNG TIN TIẾT HỌC HIỆN TẠI ---\n"
-                f"Ngữ cảnh: {lesson_context}\n"
-                f"Slide hiện tại: Trang {current_slide}\n\n"
-                f"LƯU Ý: Phản hồi bạn học 1 - 2 câu tự nhiên (dưới 40 từ), xưng hô 'cậu - tớ' hoặc 'mình - bạn'."
+                f"--- BỐI CẢNH BÀI HỌC ---\n"
+                f"{lesson_context}\n"
+                f"Slide hiện tại: Trang {current_slide}"
             )
-            temperature = 0.95
-            max_tokens = 100
+            user_prompt = (
+                f"--- DIỄN BIẾN LỚP HỌC VỪA QUA ---\n"
+                f"{transcript}\n\n"
+                f"--- YÊU CẦU CHO BẠN HỌC MINH ---\n"
+                f"{prompt_instruction or 'Hãy đọc kỹ câu nói gần nhất của Học viên hoặc Trợ giảng/Thầy Tuấn ở trên. Phản hồi lại 1-2 câu ngắn gọn, tự nhiên như bạn cùng lớp.'}"
+            )
+            temperature = 0.85
+            max_tokens = 90
             agent_id = 'peer-minh'
             agent_name = 'Minh (Bạn học)'
 
-        # 1. Call 9router / OpenAI-compatible endpoint with the specific model
+        # Call API
         api_text = await self._call_openai_compatible_api(
-            model=model_name, 
-            system_prompt=system_prompt, 
-            messages=messages, 
+            model=model_name,
+            system_prompt=system_prompt,
+            user_prompt=user_prompt,
             temperature=temperature,
             max_tokens=max_tokens
         )
-        
+
         if api_text:
             citation = None
             if role == 'instructor':
@@ -266,7 +284,7 @@ class AgentService:
                 "timestamp": "Vừa xong"
             }
 
-        # 2. Dynamic content-aware fallback if gateway disconnected
+        # Fallback if connection fails
         return self._generate_simulated_response(role, messages, current_slide)
 
     def _generate_simulated_response(self, role: str, messages: List[Dict[str, str]], current_slide: int) -> Dict[str, Any]:
@@ -279,19 +297,11 @@ class AgentService:
 
         last_lower = last_user_msg.lower()
 
-        if role == 'peer':
-            text = f"Cảm ơn bạn nhiều nha! Lời giải thích về trang Slide {current_slide} của bạn rất dễ hiểu, giúp mình vỡ lẽ ra điểm mấu chốt rồi."
-            return {
-                "id": f"peer-minh-{os.urandom(4).hex()}",
-                "sender": "peer-minh",
-                "agent_name": "Minh (Bạn học)",
-                "model_used": f"{env['model_peer']}",
-                "text": text,
-                "timestamp": "Vừa xong"
-            }
-
-        elif role == 'ta':
-            text = f"Rất tuyệt vời! Bạn đã nắm chắc trọng tâm kiến thức ở Slide {current_slide}. Hãy tiếp tục duy trì phương pháp tư duy phản biện này nhé!"
+        if role == 'ta':
+            if any(k in last_lower for k in ["khó", "giúp", "gợi ý", "chưa hiểu", "sao", "làm sao"]):
+                text = f"Để Thảo gợi ý nhé: Thuật toán như một bộ khung, nhưng nếu không có hàng triệu hình ảnh thực tế (như ImageNet) để học các mẫu hình (features), mô hình không thể nhận diện được các đặc trưng phức tạp ngoài đời. Bạn thử liên hệ xem sao?"
+            else:
+                text = f"Góc nhìn của bạn rất đáng chú ý! Hãy thử kết nối ý này với cơ chế xử lý ở Slide {current_slide} xem Minh có hiểu thêm không nhé."
             return {
                 "id": f"ta-thao-{os.urandom(4).hex()}",
                 "sender": "ta-thao",
@@ -301,9 +311,23 @@ class AgentService:
                 "timestamp": "Vừa xong"
             }
 
+        elif role == 'peer':
+            if any(k in last_lower for k in ["khó", "giúp", "chưa rõ"]):
+                text = f"Ừ công nhận phần này trừu tượng thật, may có bạn với anh/chị TA cùng bàn luận!"
+            else:
+                text = f"À ra vậy! Nghe bạn giải thích mình mới vỡ lẽ ra điểm then chốt ở Slide {current_slide}. Cảm ơn bạn nhiều nha!"
+            return {
+                "id": f"peer-minh-{os.urandom(4).hex()}",
+                "sender": "peer-minh",
+                "agent_name": "Minh (Bạn học)",
+                "model_used": f"{env['model_peer']}",
+                "text": text,
+                "timestamp": "Vừa xong"
+            }
+
         else: # instructor
-            citation = f"T06-{current_slide:03d}"
-            text = f"TS. Tuấn xác nhận: Lập luận của bạn hoàn toàn chính xác theo chuẩn tài liệu [{citation}]. Điểm năng lực (Mastery) của bạn đã được nâng cấp!"
+            citation = f"T01-{current_slide:03d}"
+            text = f"TS. Tuấn xác nhận: Lập luận của các bạn hoàn toàn chuẩn xác theo tài liệu [{citation}]. Dữ liệu quy mô lớn chính là chìa khóa mở ra kỷ nguyên Deep Learning hiện đại."
             return {
                 "id": f"prof-tuan-{os.urandom(4).hex()}",
                 "sender": "prof-tuan",
