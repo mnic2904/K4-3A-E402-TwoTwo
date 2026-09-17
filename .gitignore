@@ -8,4 +8,7 @@ node_modules
 __pycache__
 *.pdf
 dist
-venv/
+venv/
+codebase/frontend/public/slides/
+frontend/public/slides/
+**/public/slides/
