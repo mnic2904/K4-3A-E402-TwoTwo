@@ -1,19 +1,17 @@
-# Mini Hackathon AI — Batch 04 · Lớp 3A
+# Mini Hackathon AI — Batch 04 · Lớp 3A — Nhóm TwoTwo
 
-**SPEC → Prototype → Demo.** Đây không phải cuộc thi code — đây là cuộc thi **tư duy sản phẩm AI**.
+**SPEC → Prototype → Demo.** Dự án: **Lớp Học Mô Phỏng Đa Tác Tử (Multi-Agent Classroom Simulation)**
 
 ## 👥 Thành viên nhóm & Phân công vai trò
 
-**Lớp:** 3A · **Phòng:** ____ · **Cụm:** ____ · **Track:** ____
+**Lớp:** 3A · **Phòng:** E402 · **Cụm:** C4 · **Track:** Track D1 (Học tập thích ứng & tương tác — Lớp Học Mô Phỏng Đa Tác Tử)
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-|  |  |  |  |
-
-> Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
+| **Đinh Tiến Cảnh** | `2A202602918` | Technical Lead / Fullstack Dev | Xây dựng kiến trúc Backend (FastAPI, LLM orchestration, Intent Router), phát triển giao diện tương tác Frontend (React/Vite), tích hợp API và điều phối lượt nói (turn-taking) thời gian thực. |
+| **Ngô Kỳ Anh** | `2A202602916` | Product & Prompt Engineer | Xây dựng tài liệu AI Spec (`spec.md`), khảo sát JTBD & phân tích số liệu bằng chứng (Evidence), thiết kế và tinh chỉnh System Prompt cho 3 persona (Bạn học Minh, Trợ giảng Thảo, TS. Tuấn). |
+| **Vũ Đức Minh** | `2A202602895` | AI Evaluation & QA Lead | Xây dựng bộ Golden Set 22 test cases (`eval/golden_set.csv`), thiết lập kịch bản và pipeline kiểm thử tự động (`run_eval.py`, `grade.py`), đo lường và tối ưu chất lượng phản hồi qua 3 lượt eval (đạt **95.5%** pass rate). |
+| **Nguyễn Ngọc Vĩnh** | `2A202602833` | UX Researcher & Demo Lead | Thực hiện khảo sát nhu cầu người dùng ($n=31$), tổ chức thử nghiệm thực tế và ghi nhận phản hồi với 3 Willing Users (R6 Validation), thiết kế Slide thuyết trình (`demo-slides.pdf`) và xây dựng kịch bản Demo/Pitch. |
 
 - Thời lượng: **47,5 giờ** từ phát đề đến thuyết trình (ca 3A) — LAB 5 (phát đề + build) · LEC 6 (tiếp tục build theo ca) · LAB 6 (vòng thi)
 - Nhóm: **3-4 người** · thi theo phòng (E403 / E402), chia cụm rồi chung kết phòng — xem *Thể thức thi*
