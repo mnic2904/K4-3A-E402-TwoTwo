@@ -1,7 +1,5 @@
 # Validation Log - Lớp Học Mô Phỏng Đa Tác Tử
 
-> Ghi chú: Tên người thử để trống để nhóm tự điền sau. Nội dung bên dưới là log validation theo yêu cầu R6: task, quan sát, quote nguyên văn, quyết định sau khi nghe feedback.
-
 ## Bảng nhật ký người dùng thử
 
 | Người thử | Vai trò / willing user? | Task được giao | Quan sát khi dùng | Quote nguyên văn | Mức nghiêm trọng | Quyết định của nhóm |
